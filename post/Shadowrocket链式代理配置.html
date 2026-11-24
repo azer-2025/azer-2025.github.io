@@ -1,0 +1,78 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="icon" href="/favicon.ico"><script type="module" crossorigin src="/static/js/120aa8f8.js"></script><link rel="stylesheet" href="/static/css/a14e1a22.css"><!-- hexo injector head_end start --><script rel="prefetch" async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><script rel="preload" src="https://unpkg.com/blueimp-md5@^2.19.0/js/md5.min.js"></script><script rel="preload" src="https://unpkg.com/lodash@^4.17.21/lodash.min.js"></script><link rel="stylesheet" href="https://fonts.loli.net/css?family=Rubik" /><script rel="preload" src="https://unpkg.com/gitalk@^1.8.0/dist/gitalk.min.js"></script><link rel="stylesheet" href="https://unpkg.com/gitalk@^1.8.0/dist/gitalk.css"/><style>
+  .aurora-reply-btn{
+    display:inline-flex;align-items:center;gap:.35rem;
+    border:1px solid rgba(255,255,255,.25);
+    padding:.25rem .5rem;border-radius:10px;
+    font-size:.75rem;cursor:pointer;opacity:.85;
+    background:transparent;backdrop-filter:blur(4px);
+  }
+  .aurora-reply-btn:hover{opacity:1}
+  .gt-comment .aurora-reply-slot{margin-top:.35rem}
+</style>
+<!-- hexo injector head_end end --><meta name="generator" content="Hexo 8.0.0"></head><body id="body-container"><noscript><strong>We're sorry but this app doesn't work properly without JavaScript enabled. Please enable it to continue.</strong></noscript><div id="app"></div><!-- hexo injector body_end start --><script>
+  (function(){
+    // 取得 Gitalk 的文本框（兼容多版本容器）
+    function getTextarea(){
+      return document.querySelector('.gt-container textarea, .gitalk-container textarea');
+    }
+    // 从评论块中提取 Github 用户名（优先从链接 href 截取）
+    function extractUser(el){
+      var a = el.querySelector('a[href^="https://github.com/"]');
+      if(a && a.getAttribute('href')){
+        try{
+          var u = new URL(a.href);
+          var seg = u.pathname.split('/').filter(Boolean);
+          if(seg.length) return seg[0];
+        }catch(e){}
+      }
+      // 兜底：常见类名
+      var cands = ['.gt-comment-author','.gt-username','.gt-comment-username'];
+      for(var i=0;i<cands.length;i++){
+        var t = el.querySelector(cands[i]);
+        if(t && t.textContent) return t.textContent.trim();
+      }
+      return '';
+    }
+    // 在一条评论下方放置“回复”按钮
+    function mountReplyBtn(commentEl){
+      if(commentEl.querySelector('.aurora-reply-btn')) return;
+      var slot = document.createElement('div');
+      slot.className = 'aurora-reply-slot';
+      var btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'aurora-reply-btn';
+      btn.innerHTML = '↩︎ 回复';
+      btn.addEventListener('click', function(){
+        var user = extractUser(commentEl);
+        var ta = getTextarea();
+        if(!ta){ alert('请先登录 GitHub 才能回复～'); return; }
+        var at = user ? '@'+user+' ' : '';
+        // 在光标处插入 @用户名
+        var start = ta.selectionStart || ta.value.length;
+        var end   = ta.selectionEnd   || ta.value.length;
+        var before = ta.value.slice(0,start);
+        var after  = ta.value.slice(end);
+        ta.value = before + at + after;
+        // 将光标移到插入文本之后并聚焦
+        var pos = (before+at).length;
+        ta.focus(); ta.setSelectionRange(pos,pos);
+        // 若页面有“展开编辑框”的按钮，可在这里尝试点开（兼容处理）
+        var expand = document.querySelector('.gt-header-controls .gt-btn-login, .gt-btn-public');
+        // 不强制点击，避免不同版本互相影响
+      });
+      slot.appendChild(btn);
+      // 放在评论内容尾部（尽量不破坏原布局）
+      var content = commentEl.querySelector('.gt-comment-content') || commentEl;
+      content.appendChild(slot);
+    }
+    // 初始扫描 + 监听异步加载
+    function scan(){
+      document.querySelectorAll('.gt-comment').forEach(mountReplyBtn);
+    }
+    var obs = new MutationObserver(scan);
+    obs.observe(document.documentElement,{childList:true,subtree:true});
+    // 首次触发
+    document.addEventListener('DOMContentLoaded', scan);
+  })();
+</script>
+<!-- hexo injector body_end end --></body></html>
